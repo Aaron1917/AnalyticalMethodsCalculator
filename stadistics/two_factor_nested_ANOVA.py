@@ -127,7 +127,7 @@ class Nested2FactorAnava():
     def calcular_msb(self):
         return self.ssb / self.dfb
     
-    def calcular_mse(self):
+    def calcular_mse(self): 
         return self.sse / self.dfe
 
     def calcular_ms(self):
@@ -135,16 +135,28 @@ class Nested2FactorAnava():
         self.msb = self.calcular_msb()
         self.mse = self.calcular_mse()
 
+    def calcular_fa(self):
+        return self.msa / self.msb
+    
+    def calcular_fb(self):
+        return self.msb / self.mse
+
+    def calcular_f(self):
+        self.fa = self.calcular_fa()
+        self.fb = self.calcular_fb()
+
     def calculate_anova_table(self):
         self.calcular_means()
         self.calcular_ss()
         self.calcular_df()
         self.calcular_ms()
+        self.calcular_f()
         results = {
             'Factor de Variacion': ['Total', self.headers[0], self.headers[1], 'Error'],
             'Suma de cuadrados ': [self.sst, self.ssa, self.ssb, self.sse],
             'Grados de libertad': [self.dft, self.dfa, self.dfb, self.dfe],
-            'Media de cuadrados': ['', self.msa, self.msb, self.mse]
+            'Media de cuadrados': ['', self.msa, self.msb, self.mse],
+            'Valor de F calculada': ['', self.fa, self.fb, '']
         }
         return pd.DataFrame(results)
 
