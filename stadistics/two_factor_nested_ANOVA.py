@@ -68,10 +68,49 @@ class Nested2FactorAnava():
         print(f"La media de grupos A es: \n{self.media_grupoA}")
         print(f"La media de grupos B es: \n{self.media_grupoB}")
 
+    def calcular_sst(self, data: pd.DataFrame):
+        return np.sum((data - self.media_total) ** 2)
+
+    def calcular_ssa(self, data: pd.DataFrame):
+        result = 0
+        for i, a in enumerate(self.grupos_A):
+            sumatoria = (data[data[self.headers[0]] == a]['Promedio'].iloc[0] - self.media_total) ** 2
+            result += self.no_factorB[i] * len(self.no_elements[i]) * sumatoria
+        return result
+    
+    def calcular_ssb(self, data_a: pd.DataFrame, data_b: pd.DataFrame):
+        result = 0
+        for i, a in enumerate(self.grupos_A):
+            for j, b in enumerate(self.grupos_B[i]):
+                filtro = (data_b[self.headers[0]] == a) & (data_b[self.headers[1]] == b)
+                sumatoria = (data_b[filtro]['Promedio'].iloc[0] - data_a[data_a[self.headers[0]] == a]['Promedio'].iloc[0]) ** 2
+                result += self.no_elements[i][j] * sumatoria
+        return result
+    
+    def calcular_sse(self, data_p: pd.DataFrame):#residual
+        result = 0
+        for i, a in enumerate(self.grupos_A):
+            for b in self.grupos_B[i]:
+                filtro_data = (self.data[self.headers[0]] == a) & (self.data[self.headers[1]] == b)
+                filtro_mean = (data_p[self.headers[0]] == a) & (data_p[self.headers[1]] == b)
+                sumatoria = ((self.data[filtro_data][self.headers[2]] - data_p[filtro_mean]['Promedio'].iloc[0]) ** 2).sum()
+                result += sumatoria
+        return result
+
+    def calcular_ss(self): 
+        self.sst = self.calcular_sst(self.data[self.headers[2]])
+        self.ssa = self.calcular_ssa(self.media_grupoA)
+        self.ssb = self.calcular_ssb(self.media_grupoA, self.media_grupoB)
+        self.sse = self.calcular_sse(self.media_grupoB)
+
     def calculate_anova_table(self):
         self.calcular_means()
-
-    
+        self.calcular_ss()
+        results = {
+            'Factor de Variacion': ['Total', self.headers[0], self.headers[1], 'Error'],
+            'Suma de cuadrados ': [self.sst, self.ssa, self.ssb, self.sse]
+        }
+        return results
 
 if __name__ == "__main__":
     print("test")
@@ -80,14 +119,25 @@ if __name__ == "__main__":
     Escuela 2: 2 clases (Clase C y Clase D)
     Escuela 3: 3 clases (Clase A, Clase B y Clase D)
     2 estudiantes por clase
-    
     '''
     example = {
         'FA' : ['E1', 'E1', 'E1', 'E1', 'E2', 'E2', 'E2', 'E2', 'E3', 'E3', 'E3', 'E3', 'E3', 'E3'],
         'FB' : ['CA', 'CA', 'CB', 'CB', 'CC', 'CC', 'CD', 'CD', 'CA', 'CA', 'CB', 'CB', 'CC', 'CC'],
         'Cal': [85, 63, 86, 87, 84, 73, 96, 88, 75, 93, 86, 77, 95, 83]
     }
-    datos = pd.DataFrame(example)
+    '''
+    Escuela 1: 2 clases (Clase A y Clase B)
+    Escuela 2: 2 clases (Clase A y Clase B)
+    Escuela 3: 3 clases (Clase A y Clase B)
+    2 estudiantes por clase
+    '''
+    example2 = {
+        'FA' : ['E1', 'E1', 'E1', 'E1', 'E2', 'E2', 'E2', 'E2', 'E3', 'E3', 'E3', 'E3'],
+        'FB' : ['CA', 'CA', 'CB', 'CB', 'CA', 'CA', 'CB', 'CB', 'CA', 'CA', 'CB', 'CB'],
+        'Cal': [85, 63, 86, 87, 84, 73, 96, 88, 75, 93, 86, 77]
+    }
+
+    datos = pd.DataFrame(example2)
     anova_nested = Nested2FactorAnava(data=datos)
-    anova_nested.calcular_means()
-    #print(anov)
+    table = anova_nested.calculate_anova_table()
+    print(table)
