@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
+import addons as ad
 
 
-'''clase para calculos de ANOVA 2 factores cruzados considerando un DataFrame
+'''clase para calculos de ANOVA 2 factores cruzados con diseño equilibrado considerando un DataFrame
 tabla de 2 columnas + columna de observaciones como el siguiente ejemplo:
 Tabla 2 columnas + observaciones
         #   FactorA     FactorB     Observaciones
@@ -28,25 +29,6 @@ class Crossed2FactorAnova:
         self.no_factorB = len(self.grupos_B)
         self.no_elements = self.data.shape[0] / (self.no_factorA * self.no_factorB)
         self.alpha = alpha
-
-    def convert_dicct2DataFrame(data):
-        observaciones = []
-        for index, row in pd.DataFrame(data).iterrows():
-            for obs in row['Observaciones']:
-                observaciones.append({'Factor A': row['Factor A'], 'Factor B': row['Factor B'], 'Observaciones': obs})
-
-        return pd.DataFrame(observaciones)
-    
-    def convert_RowxCol2TwoCols(df: pd.DataFrame, nameFA: str = 'Factor A', nameFB: str = 'FactorB', nameObs: str = 'Observaciones') -> pd.DataFrame:
-        name_col = df.columns.to_list()[0]
-
-        df[name_col] = df[name_col].ffill()
-
-        df_long = df.melt(id_vars=[name_col], var_name=nameFA, value_name=nameObs)
-
-        df_long = df_long.rename(columns={name_col: nameFB})
-        df_long = df_long[[nameFA, nameFB, nameObs]]
-        return df_long
 
     def calcular_media(self, data: pd.DataFrame):
         return np.mean(data)
@@ -214,15 +196,7 @@ class Crossed2FactorAnova:
         }
         return results
 
-    def custom_round(value: str | float, digits: int=3) -> str | float:
-        if value == type(str()):
-            return value
-        if value == 0:
-            return 0.0
-        if abs(value) < 10**-2:
-            return f"{value:.{digits}e}".replace("e", "x10^")
-        else:
-            return round(value, digits)
+    
         
 # Ejemplo de uso
 if __name__ == "__main__":
@@ -238,7 +212,7 @@ if __name__ == "__main__":
             [87, 85, 90, 88.0]   # A2B2
         ]
     }
-    data = Crossed2FactorAnova.convert_dicct2DataFrame(data)
+    data = ad.convert_dicct2DataFrame(data)
     print()
 
     anova_croseed = Crossed2FactorAnova(data) 
