@@ -4,7 +4,7 @@ import pandas as pd
 
 '''
 #https://www.itl.nist.gov/div898/handbook/ppc/section2/ppc233.htm
-Clase para calculos de ANOVA 2 factores anidados considerando un DataFrame
+Clase para calculos de ANOVA 2 factores anidados con diseño equilibrado considerando un DataFrame
 tabla de 2 columnas + columna de observaciones como el siguiente ejemplo:
 Tabla 2 columnas + observaciones
         #   FactorA     FactorB     Observaciones
@@ -75,7 +75,7 @@ class Nested2FactorAnava():
         result = 0
         for i, a in enumerate(self.grupos_A):
             sumatoria = (data[data[self.headers[0]] == a]['Promedio'].iloc[0] - self.media_total) ** 2
-            result += self.no_factorB[i] * len(self.no_elements[i]) * sumatoria
+            result += sum(self.no_elements[i]) * sumatoria
         return result
     
     def calcular_ssb(self, data_a: pd.DataFrame, data_b: pd.DataFrame):
@@ -103,41 +103,50 @@ class Nested2FactorAnava():
         self.ssb = self.calcular_ssb(self.media_grupoA, self.media_grupoB)
         self.sse = self.calcular_sse(self.media_grupoB)
 
+    def calcular_dft(self):
+        return (self.no_factorA * self.no_factorB[0] * self.no_elements[0][0]) - 1
+
+    def calcular_dfa(self):
+        return self.no_factorA -1 
+
+    def calcular_dfb(self):
+        return self.no_factorA * (self.no_factorB[0] - 1)
+
+    def calcular_dfr(self):
+        return self.no_factorA * self.no_factorB[0] * (self.no_elements[0][0] - 1)
+
+    def calcular_df(self):
+        self.dft = self.calcular_dft()
+        self.dfa = self.calcular_dfa()
+        self.dfb = self.calcular_dfb()
+        self.dfe = self.calcular_dfr()
+
     def calculate_anova_table(self):
         self.calcular_means()
         self.calcular_ss()
+        self.calcular_df()
         results = {
             'Factor de Variacion': ['Total', self.headers[0], self.headers[1], 'Error'],
-            'Suma de cuadrados ': [self.sst, self.ssa, self.ssb, self.sse]
+            'Suma de cuadrados ': [self.sst, self.ssa, self.ssb, self.sse],
+            'Grados de libertad': [self.dft, self.dfa, self.dfb, self.dfe]
         }
-        return results
+        return pd.DataFrame(results)
 
 if __name__ == "__main__":
     print("test")
-    '''
-    Escuela 1: 2 clases (Clase A y Clase B)
-    Escuela 2: 2 clases (Clase C y Clase D)
-    Escuela 3: 3 clases (Clase A, Clase B y Clase D)
-    2 estudiantes por clase
-    '''
-    example = {
-        'FA' : ['E1', 'E1', 'E1', 'E1', 'E2', 'E2', 'E2', 'E2', 'E3', 'E3', 'E3', 'E3', 'E3', 'E3'],
-        'FB' : ['CA', 'CA', 'CB', 'CB', 'CC', 'CC', 'CD', 'CD', 'CA', 'CA', 'CB', 'CB', 'CC', 'CC'],
-        'Cal': [85, 63, 86, 87, 84, 73, 96, 88, 75, 93, 86, 77, 95, 83]
-    }
     '''
     Escuela 1: 2 clases (Clase A y Clase B)
     Escuela 2: 2 clases (Clase A y Clase B)
     Escuela 3: 3 clases (Clase A y Clase B)
     2 estudiantes por clase
     '''
-    example2 = {
+    example = {
         'FA' : ['E1', 'E1', 'E1', 'E1', 'E2', 'E2', 'E2', 'E2', 'E3', 'E3', 'E3', 'E3'],
         'FB' : ['CA', 'CA', 'CB', 'CB', 'CA', 'CA', 'CB', 'CB', 'CA', 'CA', 'CB', 'CB'],
         'Cal': [85, 63, 86, 87, 84, 73, 96, 88, 75, 93, 86, 77]
     }
 
-    datos = pd.DataFrame(example2)
+    datos = pd.DataFrame(example)
     anova_nested = Nested2FactorAnava(data=datos)
     table = anova_nested.calculate_anova_table()
     print(table)
