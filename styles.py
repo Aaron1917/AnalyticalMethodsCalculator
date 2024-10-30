@@ -33,3 +33,18 @@ config_radio_button ={
     'selectcolor':"#ffffff",
     'activebackground': '#d1ebf7'
 }
+treeview_style_general_config = {
+    'background': '#E0F7FA',
+    'fieldbackground': '#E0F7FA',
+    'foreground': '#37474F',
+    'selected_fg': '#37474F',
+    'selected_bg': '#0277BD',
+    'font': ('Arial', 10)
+}
+treeview_style_header_config = {
+    'header_background': '#0288D1',  # Fondo del encabezado de columnas
+    'header_foreground': 'white',    # Texto del encabezado de columnas
+    'font': ('Arial', 14, "bold"),
+    'activebg': "#0277BD",
+    'activefg': 'white'
+}

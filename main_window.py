@@ -9,8 +9,8 @@ class AppCalculadora(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Calculadora Métodos Análiticos")
-        self.minsize(width=600, height=400)
-        self.geometry("600x400+50+50")
+        self.minsize(width=620, height=700)
+        self.geometry("620x700+50+50")
         self.configure(bg="#003F87")
 
         self.create_notebook()
