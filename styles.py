@@ -39,7 +39,8 @@ treeview_style_general_config = {
     'foreground': '#37474F',
     'selected_fg': '#37474F',
     'selected_bg': '#0277BD',
-    'font': ('Arial', 10)
+    'font': ('Arial', 10),
+    'rows_bg': ["#E0F7FA", "#81D4FA"]
 }
 treeview_style_header_config = {
     'header_background': '#0288D1',  # Fondo del encabezado de columnas

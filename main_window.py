@@ -23,7 +23,7 @@ class AppCalculadora(tk.Tk):
         self.notebook.add_tab(tab_2_factor_crossed, tab_name="Cruzado")
         # self.notebook.add_tab(tab_2_factor_nested, tab_name="Anidado")
         
-        self.notebook.pack(expand=True, fill="both")
+        #self.notebook.pack(expand=True, fill="both")
 
 
 if __name__ == "__main__":

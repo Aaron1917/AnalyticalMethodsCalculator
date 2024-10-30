@@ -5,6 +5,7 @@ import numpy as np
 from table_treeview import EditableTreeviewGadget as table
 import styles
 import stadistics.addons as addons
+from stadistics.two_factor_crossed_ANOVA import Crossed2FactorAnova as C2FA
 
 class tab_2_factor_crossed(tk.Frame):
     def __init__(self, parent):
@@ -14,8 +15,8 @@ class tab_2_factor_crossed(tk.Frame):
         self.no_fB = tk.StringVar(value=2)
         self.no_el = tk.StringVar(value=2)
         self.alpha = tk.StringVar(value=0.05)
-        self.tags_names = [tk.StringVar() for _ in range(4)]
         self.tags_str = ["FactorA", "FactorB", "Eventos", "alpha"]
+        self.tags_names = [tk.StringVar(value=self.tags_str[_]) for _ in range(4)]
 
         self.table_type = tk.StringVar(value="TresColumnas")
         self.current_table_type = 'TresColumnas'
@@ -24,25 +25,37 @@ class tab_2_factor_crossed(tk.Frame):
         self.configurar_pestaña()
         self.create_buttons()
         self.input_data = None
+        self.anova_data = None
         self.input_data_widget = None
-        frame_data = tk.Frame(self.frame_table)
-        frame_data.pack(side="top", fill="x")
-        self.input_data_widget = table(parent=frame_data, dataframe=self.input_data)
-        self.input_data_widget.pack(expand=True, fill='x')
+        self.anova_data_widget = None
+
+        self.input_data_widget = table(parent=self.frame_table,
+                                       dataframe=self.input_data,
+                                       num_visible_rows=26)
+        self.input_data_widget.pack(expand=True, fill='both')
+
+        self.anova_data_widget = table(parent=self.frame_anovatable,
+                                       dataframe=self.anova_data,
+                                       num_visible_rows=6,
+                                       min_width_cell=240,
+                                       editable=False)
+        self.anova_data_widget.pack(expand=True, fill='both')
+
         self.clear_data_table()
+        self.clear_anova_table()
 
     def create_frames(self):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=2)
-        self.grid_rowconfigure(2, weight=2)
-        self.grid_rowconfigure(3, weight=2)
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(1, weight=0)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=0)
 
         self.frame_title = tk.Frame(self, background='#E0F7FA')
         self.frame_user_data = tk.Frame(self, background='#E0F7FA')
-        self.frame_table = tk.Frame(self, background='#E0F7FA')
+        self.frame_table = tk.Frame(self, background='yellow')
         self.frame_anovatable = tk.Frame(self, background='#E0F7FA')
         
         self.frame_title.grid(row=0, column=0, columnspan=2, sticky='nsew')
@@ -84,16 +97,12 @@ class tab_2_factor_crossed(tk.Frame):
         self.entry_tagfb.grid(row=2, column=2, padx=5, sticky='w')
         self.entry_tagel.grid(row=3, column=2, padx=5, sticky='w')
         self.entry_tagal.grid(row=4, column=2, padx=5, sticky='w')
-        self.entry_tagfa.insert(0,self.tags_str[0])
-        self.entry_tagfb.insert(0,self.tags_str[1])
-        self.entry_tagel.insert(0,self.tags_str[2])
-        self.entry_tagal.insert(0,self.tags_str[3])
     
     def create_buttons(self):
         self.radiob_cxrc = tk.Radiobutton(self.frame_user_data, text="FilxCol. C.", value="FilaxColumnaC.", variable=self.table_type, **styles.config_radio_button, command=self.change_table_type)
         self.radiob_cxr = tk.Radiobutton(self.frame_user_data, text="FilaxCol.", value="FilaxColumna", variable=self.table_type, **styles.config_radio_button, command=self.change_table_type)
         self.radiob_cc = tk.Radiobutton(self.frame_user_data, text="3Columnas", value="TresColumnas", variable=self.table_type, **styles.config_radio_button, command=self.change_table_type)
-        self.button_calculate = tk.Button(self.frame_user_data, width=12, text="Calcular tabla", **styles.config_boton)
+        self.button_calculate = tk.Button(self.frame_user_data, width=12, text="Calcular tabla", command=self.calcular_anova,**styles.config_boton)
         self.button_import = tk.Button(self.frame_user_data, width=12, text="Importar Datos", command=self.import_data, **styles.config_boton)
         self.button_update_table = tk.Button(self.frame_user_data, width=12, text="Actualizar tabla", **styles.config_boton)
         self.button_clear_table = tk.Button(self.frame_user_data, width=12, text="Limpiar tabla", command=self.clear_data_table, **styles.config_boton)
@@ -288,6 +297,41 @@ class tab_2_factor_crossed(tk.Frame):
         self.input_data_widget.set_parameter(dataframe=self.input_data)
         
         messagebox.showinfo("Éxito", "Los datos se importaron correctamente.")
+
+    def calcular_anova(self):
+        self.input_data = self.input_data_widget.get_dataframe()
+        self.input_data.replace('nan', np.nan, inplace=True)
+        if self.input_data.isna().any().any():
+            messagebox.showerror("Error", "Alguno de los elementos en la tabla no es válido")
+            self.change_table_type()
+            return None
+        
+        self.change_table_type("TresColumnas")
+        col3 = self.input_data.columns.to_list()[2]
+        self.input_data[col3] = pd.to_numeric(self.input_data[col3], errors='coerce')
+        if self.input_data[col3].isnull().any():
+            messagebox.showerror("Error", "Alguno de los elementos en la tabla no es válido")
+            self.change_table_type()
+            return None
+        
+        p, q, r = self.numbers_group()
+        if p * q * r != self.input_data.shape[0]:
+            messagebox.showerror("Error", "El número de datos no coincide con los parámetros")
+            return None
+        self.c2fa = C2FA(data=self.input_data, alpha=float(self.alpha.get()))
+        self.anova_data = pd.DataFrame(self.c2fa.calculate_anova_table())
+        self.anova_data = addons.apply_funtion_df(self.anova_data, addons.custom_round)
+        self.anova_data_widget.set_parameter(dataframe=self.anova_data)
+    
+    def clear_anova_table(self):
+        self.anova_data = pd.DataFrame({
+            'Factor de Variación': ['Total', 'Between', self.tags_names[0].get(), self.tags_names[1].get(), 'Interacción', 'Error'],
+            'Suma de cuadrados ': ['' for _ in range(6)],
+            'Grados de libertad': ['' for _ in range(6)],
+            'Media de cuadrados': ['' for _ in range(6)],
+            'F. Calculada': ['' for _ in range(6)]
+        })
+        self.anova_data_widget.set_parameter(self.anova_data)
 
 if __name__ == "__main__":
     root = tk.Tk()

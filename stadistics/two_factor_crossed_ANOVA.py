@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import addons as ad
+# import addons as ad
 
 
 '''clase para calculos de ANOVA 2 factores cruzados con diseño equilibrado considerando un DataFrame

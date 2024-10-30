@@ -57,6 +57,12 @@ def convert_ThreeCol2RxCc(df: pd.DataFrame):
     df_pivot.columns.name = None
     return df_pivot.reset_index()
 
+def apply_funtion_df(df: pd.DataFrame, fun) -> pd.DataFrame:
+    headers = df.columns.to_list()
+    for h in headers:
+        df[h] = df[h].apply(lambda x: fun(x))
+
+    return df
 def same_items_list(list: list) -> bool:
     return True if len(set(list)) == 1 else False
 
