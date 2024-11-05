@@ -33,6 +33,17 @@ config_radio_button ={
     'selectcolor':"#ffffff",
     'activebackground': '#d1ebf7'
 }
+
+config_notebook ={
+    'fg':'white',
+    'font':("Arial", 10, 'bold'),
+    'relief':'flat',
+    'bg_navigation':'#0288D1',
+    'bg_container':'#0277BD',
+    'bg_selected':'#0277BD',
+    'bg_active': '#0288D1'
+}
+
 treeview_style_general_config = {
     'background': '#E0F7FA',
     'fieldbackground': '#E0F7FA',
@@ -42,9 +53,10 @@ treeview_style_general_config = {
     'font': ('Arial', 10),
     'rows_bg': ["#E0F7FA", "#81D4FA"]
 }
+
 treeview_style_header_config = {
-    'header_background': '#0288D1',  # Fondo del encabezado de columnas
-    'header_foreground': 'white',    # Texto del encabezado de columnas
+    'header_background': '#0288D1',
+    'header_foreground': 'white',
     'font': ('Arial', 14, "bold"),
     'activebg': "#0277BD",
     'activefg': 'white'

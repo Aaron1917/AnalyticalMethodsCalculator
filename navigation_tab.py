@@ -1,29 +1,34 @@
 import tkinter as tk
 from tkinter import ttk
+import styles
 
 class TabbedBrowser(tk.Frame):
-    def __init__(self, parent, separator:bool = False, nav_bg ="#0091EA", selected = "#A1C8E4", active = "#0091EA"):
+    def __init__(self, parent, style:dict=None, separator:bool = False): # nav_bg ="#0091EA", selected = "#A1C8E4", active = "#0091EA"
         super().__init__(parent)
         self.separator = separator
+        self.style = style if style is not None else styles.config_notebook
         
         self.list_frames = []
         self.frames = {}
         self.buttons = {}
 
-        self.col_selected = selected
-        self.col_active = active
-
-        self.nav_frame = tk.Frame(self, bg=nav_bg)
+        self.nav_frame = tk.Frame(self, bg=self.style["bg_navigation"])
         self.nav_frame.pack(side=tk.TOP, fill=tk.X)
 
-        self.container = tk.Frame(self)
+        self.container = tk.Frame(self, bg=self.style['bg_container'])
         self.container.pack(expand=True, fill=tk.BOTH)
 
     def add_tab(self, frame_class: tk.Frame, tab_name: str):
 
         self.list_frames.append(tab_name)
 
-        button = tk.Button(self.nav_frame, text=tab_name, command=lambda t=tab_name: self.show_tab(t), relief="flat")
+        button = tk.Button(self.nav_frame,
+                           text=tab_name,
+                           command=lambda t=tab_name: self.show_tab(t),
+                           relief=self.style['relief'],
+                           font=self.style['font'],
+                           foreground=self.style['fg'],
+                           background=self.style['bg_active'])
         button.pack(side=tk.LEFT)
         if self.separator:
             separator = ttk.Separator(self.nav_frame, orient="vertical")
@@ -49,9 +54,9 @@ class TabbedBrowser(tk.Frame):
         for frame in self.frames.values():
             frame.pack_forget()
         for button in self.buttons.values():
-            button.config(bg = self.col_active)        
+            button.config(bg=self.style["bg_active"])
         # Mostrar el frame seleccionado
-        self.buttons[frame_name].config(bg=self.col_selected)
+        self.buttons[frame_name].config(bg=self.style["bg_selected"])
         self.frames[frame_name].pack(fill=tk.BOTH, expand=True)
 
 class Frame1(tk.Frame):
@@ -79,7 +84,7 @@ if __name__ == "__main__":
     root.geometry("400x300")
 
     # Crear una instancia de CustomNotebook
-    notebook = TabbedBrowser(root)
+    notebook = TabbedBrowser(root, style=styles.config_notebook)
     notebook.pack(expand=True, fill=tk.BOTH)
 
     notebook.add_tab(Frame1, "Pestaña 1")
