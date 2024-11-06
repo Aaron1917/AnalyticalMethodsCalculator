@@ -3,7 +3,9 @@ import pandas as pd
 # import addons as ad
 
 
-'''clase para calculos de ANOVA 2 factores cruzados con diseño equilibrado considerando un DataFrame
+'''
+https://www.itl.nist.gov/div898/handbook/ppc/section2/ppc232.htm
+Clase para calculos de ANOVA 2 factores cruzados con diseño equilibrado considerando un DataFrame
 tabla de 2 columnas + columna de observaciones como el siguiente ejemplo:
 Tabla 2 columnas + observaciones
         #   FactorA     FactorB     Observaciones
@@ -18,8 +20,6 @@ class Crossed2FactorAnova:
 
     def __init__(self, data: pd.DataFrame, alpha: float=0.05):
         self.headers = data.columns.to_list()
-        print(type(self.headers))
-        print(self.headers)
 
         self.data = data
         self.grupos_A = self.data[self.headers[0]].unique()
@@ -188,7 +188,7 @@ class Crossed2FactorAnova:
         self.calcular_f()
 
         results = {
-            'Factor de Variacion': ['Total', 'Between', self.headers[0], self.headers[1], 'Interaccion', 'Error'],
+            'Factor de Variación': ['Total', 'Between', self.headers[0], self.headers[1], 'Interacción', 'Error'],
             'Suma de cuadrados ': [self.sst, self.ssbtw, self.ssa, self.ssb, self.ssab, self.sse],
             'Grados de libertad': [self.dft, self.dfbtw, self.dfa, self.dfb, self.dfab, self.dfe],
             'Media de cuadrados': [self.mst, self.msbtw, self.msa, self.msb, self.msab, self.mse],

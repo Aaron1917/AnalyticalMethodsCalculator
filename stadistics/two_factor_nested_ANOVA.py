@@ -64,9 +64,9 @@ class Nested2FactorAnava():
         self.media_grupoA = self.calcular_media_grupoA(self.data, self.grupos_A)
         self.media_grupoB = self.calcular_media_grupoB(self.data, self.grupos_A, self.grupos_B)
 
-        print(f"La media total es: \n{self.media_total}")
-        print(f"La media de grupos A es: \n{self.media_grupoA}")
-        print(f"La media de grupos B es: \n{self.media_grupoB}")
+        # print(f"La media total es: \n{self.media_total}")
+        # print(f"La media de grupos A es: \n{self.media_grupoA}")
+        # print(f"La media de grupos B es: \n{self.media_grupoB}")
 
     def calcular_sst(self, data: pd.DataFrame):
         return np.sum((data - self.media_total) ** 2)
@@ -152,11 +152,11 @@ class Nested2FactorAnava():
         self.calcular_ms()
         self.calcular_f()
         results = {
-            'Factor de Variacion': ['Total', self.headers[0], self.headers[1], 'Error'],
+            'Factor de Variación': ['Total', self.headers[0], self.headers[1], 'Error'],
             'Suma de cuadrados ': [self.sst, self.ssa, self.ssb, self.sse],
             'Grados de libertad': [self.dft, self.dfa, self.dfb, self.dfe],
             'Media de cuadrados': ['', self.msa, self.msb, self.mse],
-            'Valor de F calculada': ['', self.fa, self.fb, '']
+            'F. calculada': ['', self.fa, self.fb, '']
         }
         return pd.DataFrame(results)
 
