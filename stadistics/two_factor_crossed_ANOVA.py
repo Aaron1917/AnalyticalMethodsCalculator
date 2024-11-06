@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-# import addons as ad
+import addons as ad
 
 
 '''
@@ -180,7 +180,7 @@ class Crossed2FactorAnova:
         self.fab = self.calcular_fab()
         
 
-    def calculate_anova_table(self):
+    def calculate_anova_table(self)-> pd.DataFrame:
         self.calcular_means()
         self.calcular_ss()
         self.calcular_df()
@@ -194,7 +194,7 @@ class Crossed2FactorAnova:
             'Media de cuadrados': [self.mst, self.msbtw, self.msa, self.msb, self.msab, self.mse],
             'F. Calculada': ['', '', self.fa, self.fb, self.fab, '']
         }
-        return results
+        return pd.DataFrame(results)
 
     
         

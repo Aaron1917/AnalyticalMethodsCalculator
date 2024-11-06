@@ -55,7 +55,7 @@ class tab_2_factor_crossed(tk.Frame):
 
         self.frame_title = tk.Frame(self, background='#E0F7FA')
         self.frame_user_data = tk.Frame(self, background='#E0F7FA')
-        self.frame_table = tk.Frame(self, background='yellow')
+        self.frame_table = tk.Frame(self, background='#E0F7FA')
         self.frame_anovatable = tk.Frame(self, background='#E0F7FA')
         
         self.frame_title.grid(row=0, column=0, columnspan=2, sticky='nsew')
@@ -81,9 +81,9 @@ class tab_2_factor_crossed(tk.Frame):
         self.label_nofb.grid(row=2, column=0, padx=5, sticky='w')
         self.label_noel.grid(row=3, column=0, padx=5, sticky='w')
         self.label_alpha.grid(row=4, column=0, padx=5, sticky='w')
-        self.entry_nofa = tk.Entry(self.frame_user_data, width=5, textvariable=self.no_fA, **styles.config_entry,)
-        self.entry_nofb = tk.Entry(self.frame_user_data, width=5, textvariable=self.no_fB, **styles.config_entry)
-        self.entry_noel = tk.Entry(self.frame_user_data, width=5, textvariable=self.no_el, **styles.config_entry)
+        self.entry_nofa = tk.Entry(self.frame_user_data, width=5, textvariable=self.no_fA, state='readonly', **styles.config_entry,)
+        self.entry_nofb = tk.Entry(self.frame_user_data, width=5, textvariable=self.no_fB, state='readonly', **styles.config_entry)
+        self.entry_noel = tk.Entry(self.frame_user_data, width=5, textvariable=self.no_el, state='readonly', **styles.config_entry)
         self.entry_alpha= tk.Entry(self.frame_user_data, width=5, textvariable=self.alpha, **styles.config_entry)
         self.entry_nofa.grid(row=1, column=1, padx=5, sticky='w')
         self.entry_nofb.grid(row=2, column=1, padx=5, sticky='w')
@@ -319,7 +319,8 @@ class tab_2_factor_crossed(tk.Frame):
             messagebox.showerror("Error", "El número de datos no coincide con los parámetros")
             return None
         self.c2fa = C2FA(data=self.input_data, alpha=float(self.alpha.get()))
-        self.anova_data = pd.DataFrame(self.c2fa.calculate_anova_table())
+        self.change_table_type()
+        self.anova_data = self.c2fa.calculate_anova_table()
         self.anova_data = addons.apply_funtion_df(self.anova_data, addons.custom_round)
         self.anova_data_widget.set_parameter(dataframe=self.anova_data)
     

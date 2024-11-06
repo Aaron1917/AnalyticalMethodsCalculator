@@ -69,6 +69,8 @@ def same_items_list(list: list) -> bool:
 def custom_round(value: str | float, digits: int=3) -> str | float:
     if type(value) == type(str()):
         return value
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
     if value == 0:
         return 0.0
     if abs(value) < 10**-2:
