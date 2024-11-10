@@ -300,30 +300,17 @@ class tab_2_factor_crossed(tk.Frame):
 
     def calcular_anova(self):
         self.input_data = self.input_data_widget.get_dataframe()
-        self.input_data = addons.apply_funtion_df(self.input_data, addons.replace_nan_string)
-        if self.input_data.isna().any().any():
-            messagebox.showerror("Error", "Alguno de los elementos en la tabla no es válido")
-            self.change_table_type()
-            return None
-        
         self.change_table_type("TresColumnas")
-        col3 = self.input_data.columns.to_list()[2]
-        self.input_data[col3] = pd.to_numeric(self.input_data[col3], errors='coerce')
-        if self.input_data[col3].isnull().any():
-            messagebox.showerror("Error", "Alguno de los elementos en la tabla no es válido")
+        try:
+            self.c2fa = C2FA(data=self.input_data, values=self.numbers_group(), alpha=float(self.alpha.get()))
             self.change_table_type()
-            return None
-        
-        p, q, r = self.numbers_group()
-        if p * q * r != self.input_data.shape[0]:
-            messagebox.showerror("Error", "El número de datos no coincide con los parámetros")
-            return None
-        self.c2fa = C2FA(data=self.input_data, alpha=float(self.alpha.get()))
-        self.change_table_type()
-        self.anova_data = self.c2fa.calculate_anova_table()
-        self.anova_data = addons.apply_funtion_df(self.anova_data, addons.custom_round)
-        self.anova_data_widget.set_parameter(dataframe=self.anova_data)
-    
+            self.anova_data = self.c2fa.calculate_anova_table()
+            self.anova_data = addons.apply_funtion_df(self.anova_data, addons.custom_round)
+            self.anova_data_widget.set_parameter(dataframe=self.anova_data)
+        except ValueError as e:
+            self.change_table_type()
+            messagebox.showerror("Error", f"Error en los datos: {e}")
+
     def clear_anova_table(self):
         self.anova_data = pd.DataFrame({
             'Factor de Variación': ['Total', 'Between', self.tags_names[0].get(), self.tags_names[1].get(), 'Interacción', 'Error'],

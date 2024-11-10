@@ -81,7 +81,8 @@ def custom_round(value: str | float, digits: int=3) -> str | float:
 def replace_nan_string(value: str):
     if value == 'nan':
         return np.nan
-
+    else:
+        return value
 
 if __name__ == "__main__":
     data = {
