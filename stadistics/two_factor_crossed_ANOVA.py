@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import addons as ad
+import stadistics.addons as ad
 
 
 '''

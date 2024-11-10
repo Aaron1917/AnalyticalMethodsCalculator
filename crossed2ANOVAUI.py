@@ -300,7 +300,7 @@ class tab_2_factor_crossed(tk.Frame):
 
     def calcular_anova(self):
         self.input_data = self.input_data_widget.get_dataframe()
-        self.input_data.replace('nan', np.nan, inplace=True)
+        self.input_data = addons.apply_funtion_df(self.input_data, addons.replace_nan_string)
         if self.input_data.isna().any().any():
             messagebox.showerror("Error", "Alguno de los elementos en la tabla no es válido")
             self.change_table_type()

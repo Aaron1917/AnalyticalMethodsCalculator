@@ -152,7 +152,7 @@ class Nested2FactorAnava():
         self.calcular_ms()
         self.calcular_f()
         results = {
-            'Factor de Variación': ['Total', self.headers[0], self.headers[1], 'Error'],
+            'Factor de Variación': ['Total', f'{self.headers[0], self.headers[1]} en {self.headers[0]}', 'Error'],
             'Suma de cuadrados ': [self.sst, self.ssa, self.ssb, self.sse],
             'Grados de libertad': [self.dft, self.dfa, self.dfb, self.dfe],
             'Media de cuadrados': ['', self.msa, self.msb, self.mse],

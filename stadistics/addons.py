@@ -77,6 +77,10 @@ def custom_round(value: str | float, digits: int=3) -> str | float:
         return f"{value:.{digits}e}".replace("e", "x10^")
     else:
         return round(value, digits)
+    
+def replace_nan_string(value: str):
+    if value == 'nan':
+        return np.nan
 
 
 if __name__ == "__main__":

@@ -300,7 +300,7 @@ class tab_2_factor_nested(tk.Frame):
 
     def calcular_anova(self):
         self.input_data = self.input_data_widget.get_dataframe()
-        self.input_data.replace('nan', np.nan, inplace=True)
+        self.input_data = addons.apply_funtion_df(self.input_data, addons.replace_nan_string)
         if self.input_data.isna().any().any():
             messagebox.showerror("Error", "Alguno de los elementos en la tabla no es válido")
             self.change_table_type()
@@ -326,7 +326,7 @@ class tab_2_factor_nested(tk.Frame):
     
     def clear_anova_table(self):
         self.anova_data = pd.DataFrame({
-            'Factor de Variación': ['Total', self.tags_names[0].get(), self.tags_names[1].get(), 'Error'],
+            'Factor de Variación': ['Total', self.tags_names[0].get(), f'{self.tags_names[1].get()} en {self.tags_names[0].get()}', 'Error'],
             'Suma de cuadrados ': ['' for _ in range(4)],
             'Grados de libertad': ['' for _ in range(4)],
             'Media de cuadrados': ['' for _ in range(4)],
