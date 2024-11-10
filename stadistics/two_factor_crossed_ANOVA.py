@@ -21,7 +21,7 @@ class Crossed2FactorAnova:
     def __init__(self, data: pd.DataFrame = None,
                  values: list | tuple = None,
                  alpha: float=0.05):
-        
+        self.alpha = alpha
         self.headers = data.columns.to_list()
         self.data = ad.apply_funtion_df(data, ad.replace_nan_string)
         self.data[self.headers[2]] = pd.to_numeric(self.data[self.headers[2]], errors='coerce')
@@ -34,6 +34,15 @@ class Crossed2FactorAnova:
         self.no_factorA = len(self.grupos_A)
         self.no_factorB = len(self.grupos_B)
         self.no_elements = self.data.shape[0] // (self.no_factorA * self.no_factorB)
+        
+        self.table_count_elements = self.data.groupby(self.headers[:2]).size().reset_index(name='Conteo')
+        if not ad.same_items_list(self.table_count_elements['Conteo'].to_list()):
+            raise ValueError(f'El número de {self.headers[2]} de cada combinación no está equilibrado')
+        
+        self.table_count_factorsB = self.data.groupby(self.headers[0])[self.headers[1]].nunique().reset_index(name='No.FactorB')
+        if not ad.same_items_list(self.table_count_factorsB['No.FactorB'].to_list()):
+            raise ValueError(f'El número de {self.headers[1]} de cada combinación no está equilibrado')
+        
         if values is not None:
             if self.no_factorA != values[0]:
                 raise ValueError(f'El número de {self.headers[0]} no coincide con los datos ingresados')
@@ -41,15 +50,6 @@ class Crossed2FactorAnova:
                 raise ValueError(f'El número de {self.headers[1]} no coincide con los datos ingresados')
             if self.no_elements != values[2]:
                 raise ValueError(f'El número de {self.headers[2]} no coincide con los datos ingresados')
-        
-        self.table_count_elements = self.data.groupby(self.headers[:2]).size().reset_index(name='Conteo')
-        if not ad.same_items_list(self.table_count_elements['Conteo'].to_list()):
-            raise ValueError(f'El número de {self.headers[2]} de cada combinación no esta equilibrado')
-        
-        self.table_count_factorsB = self.data.groupby(self.headers[0])[self.headers[1]].nunique().reset_index(name='No.FactorB')
-        if not ad.same_items_list(self.table_count_factorsB['No.FactorB'].to_list()):
-            raise ValueError(f'El número de {self.headers[1]} de cada combinación no esta equilibrado')
-        self.alpha = alpha
 
     def calcular_media(self, data: pd.DataFrame):
         return np.mean(data)

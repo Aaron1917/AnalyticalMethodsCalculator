@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import stadistics.addons as ad
 
 
 '''
@@ -16,10 +17,16 @@ Tabla 2 columnas + observaciones
 '''
 class Nested2FactorAnava():
 
-    def __init__(self, data: pd.DataFrame, alpha: float = 0.05):
+    def __init__(self, data: pd.DataFrame = None,
+                 values: list | tuple = None,
+                 alpha: float=0.05):
+        self.alpha = alpha
         self.headers = data.columns.to_list()
+        self.data = ad.apply_funtion_df(data, ad.replace_nan_string)
+        self.data[self.headers[2]] = pd.to_numeric(self.data[self.headers[2]], errors='coerce')
+        if self.data.isna().any().any():
+            raise ValueError('Alguno de los datos no es válido, favor de revisarlos.')
         
-        self.data = data
         self.grupos_A = self.data[self.headers[0]].unique()
         self.no_factorA = len(self.grupos_A)
 
@@ -37,7 +44,22 @@ class Nested2FactorAnava():
                 ]
 
         self.no_elements = [[len(e) for e in sublist] for sublist in elements]
-        self.alpha = alpha
+
+        self.table_count_elements = self.data.groupby(self.headers[:2]).size().reset_index(name='Conteo')
+        if not ad.same_items_list(self.table_count_elements['Conteo'].to_list()):
+            raise ValueError(f'El número de {self.headers[2]} de cada combinación no está equilibrado')
+        
+        self.table_count_factorsB = self.data.groupby(self.headers[0])[self.headers[1]].nunique().reset_index(name='No.FactorB')
+        if not ad.same_items_list(self.table_count_factorsB['No.FactorB'].to_list()):
+            raise ValueError(f'El número de {self.headers[1]} de cada combinación no está equilibrado')
+
+        if values is not None:
+            if self.no_factorA != values[0]:
+                raise ValueError(f'El número de {self.headers[0]} no coincide con los datos ingresados')
+            if self.no_factorB[0] != values[1]:
+                raise ValueError(f'El número de {self.headers[1]} no coincide con los datos ingresados')
+            if self.no_elements[0][0] != values[2]:
+                raise ValueError(f'El número de {self.headers[2]} no coincide con los datos ingresados')
 
     def calcular_media(self, data: pd.DataFrame):
         return np.mean(data)
@@ -152,7 +174,7 @@ class Nested2FactorAnava():
         self.calcular_ms()
         self.calcular_f()
         results = {
-            'Factor de Variación': ['Total', f'{self.headers[0], self.headers[1]} en {self.headers[0]}', 'Error'],
+            'Factor de Variación': ['Total', self.headers[0], f'{self.headers[1]} en {self.headers[0]}', 'Error'],
             'Suma de cuadrados ': [self.sst, self.ssa, self.ssb, self.sse],
             'Grados de libertad': [self.dft, self.dfa, self.dfb, self.dfe],
             'Media de cuadrados': ['', self.msa, self.msb, self.mse],
