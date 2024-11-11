@@ -1,6 +1,7 @@
 # Ignorar el entorno virtual
 venv/
-
+# Ignorar carpta test
+test/
 # Ignorar archivos generados y compilados
 # Prerequisites
 *.d
